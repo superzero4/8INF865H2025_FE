@@ -19,6 +19,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -67,9 +68,12 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun TipTimeLayout() {
-    var amountInput by remember { mutableStateOf("") }
+    //Defaut values not empty strings but number for faster testing
+    var amountInput by remember { mutableStateOf("100") }
     val amount = amountInput.toDoubleOrNull() ?: 0.0
-    val tip = calculateTip(amount)
+    var tipInput by remember { mutableStateOf("20") }
+    val tipPercent = tipInput.toDoubleOrNull() ?: 0.0
+    val tip = calculateTip(amount,tipPercent)
     Column(
         modifier = Modifier
             .statusBarsPadding()
@@ -86,9 +90,20 @@ fun TipTimeLayout() {
                 .align(alignment = Alignment.Start)
         )
         EditNumberField(
+            label = R.string.bill_amount,
             value = amountInput,
             onValueChange = {
                 amountInput = it
+            },
+            Modifier
+                .padding(bottom = 32.dp)
+                .fillMaxWidth()
+        )
+        EditNumberField(
+            label = R.string.how_was_the_service,
+            value = tipInput,
+            onValueChange = {
+                tipInput = it
             },
             Modifier
                 .padding(bottom = 32.dp)
@@ -103,9 +118,12 @@ fun TipTimeLayout() {
 }
 
 @Composable
-private fun EditNumberField(value: String,
-                            onValueChange: (String) -> Unit,
-                            modifier: Modifier = Modifier) {
+private fun EditNumberField(
+    @StringRes label: Int,
+    value: String,
+    onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
 
     TextField(
         value = value,
@@ -113,7 +131,7 @@ private fun EditNumberField(value: String,
         singleLine = true,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
         onValueChange = onValueChange,
-        label = { Text(stringResource(R.string.bill_amount)) }
+        label = { Text(stringResource(label)) }
     )
 }
 
