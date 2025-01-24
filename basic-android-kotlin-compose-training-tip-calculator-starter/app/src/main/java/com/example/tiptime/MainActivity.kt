@@ -67,6 +67,9 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun TipTimeLayout() {
+    var amountInput by remember { mutableStateOf("") }
+    val amount = amountInput.toDoubleOrNull() ?: 0.0
+    val tip = calculateTip(amount)
     Column(
         modifier = Modifier
             .statusBarsPadding()
@@ -75,6 +78,7 @@ fun TipTimeLayout() {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+
         Text(
             text = stringResource(R.string.calculate_tip),
             modifier = Modifier
@@ -82,12 +86,16 @@ fun TipTimeLayout() {
                 .align(alignment = Alignment.Start)
         )
         EditNumberField(
+            value = amountInput,
+            onValueChange = {
+                amountInput = it
+            },
             Modifier
                 .padding(bottom = 32.dp)
                 .fillMaxWidth()
         )
         Text(
-            text = stringResource(R.string.tip_amount, "$0.00"),
+            text = stringResource(R.string.tip_amount, tip),
             style = MaterialTheme.typography.displaySmall
         )
         Spacer(modifier = Modifier.height(150.dp))
@@ -95,16 +103,16 @@ fun TipTimeLayout() {
 }
 
 @Composable
-private fun EditNumberField(modifier: Modifier = Modifier) {
-    var amountInput by remember { mutableStateOf("") }
+private fun EditNumberField(value: String,
+                            onValueChange: (String) -> Unit,
+                            modifier: Modifier = Modifier) {
+
     TextField(
-        value = amountInput,
+        value = value,
         modifier = modifier,
         singleLine = true,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-        onValueChange = {
-            amountInput = it
-        },
+        onValueChange = onValueChange,
         label = { Text(stringResource(R.string.bill_amount)) }
     )
 }
