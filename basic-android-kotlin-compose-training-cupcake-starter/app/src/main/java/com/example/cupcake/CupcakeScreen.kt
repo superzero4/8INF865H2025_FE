@@ -103,6 +103,10 @@ fun CupcakeApp(
             composable(route = CupcakeScreen.Start.name) {
                 StartOrderScreen(
                     quantityOptions = DataSource.quantityOptions,
+                    onNextButtonClicked = {x : Int ->
+                        viewModel.setQuantity(x)
+                        navController.navigate(CupcakeScreen.Flavor.name)
+                    },
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(dimensionResource(R.dimen.padding_medium))
@@ -115,17 +119,29 @@ fun CupcakeApp(
                     subtotal = uiState.price,
                     options = DataSource.flavors.map { id -> context.resources.getString(id) },
                     modifier = Modifier.fillMaxHeight(),
+                    onCancelButtonClicked = {
+                        cancelOrderAndNavigateToStart(viewModel,navController)
+                    },
+                    onNextButtonClicked = {
+                        navController.navigate(CupcakeScreen.Pickup.name)
+                    },
                     onSelectionChanged = { it ->
                         viewModel.setFlavor(it)
                     })
             }
-            composable(route = CupcakeScreen.Flavor.name) {
+            composable(route = CupcakeScreen.Pickup.name) {
                 val context = LocalContext.current
 
                 SelectOptionScreen(
                     subtotal = uiState.price,
                     options = uiState.pickupOptions,
                     modifier = Modifier.fillMaxHeight(),
+                    onCancelButtonClicked = {
+                        cancelOrderAndNavigateToStart(viewModel,navController)
+                    },
+                    onNextButtonClicked = {
+                        navController.navigate(CupcakeScreen.Summary.name)
+                    },
                     onSelectionChanged = { it ->
                         viewModel.setFlavor(it)
                     })
@@ -133,9 +149,20 @@ fun CupcakeApp(
             composable(route = CupcakeScreen.Summary.name) {
                 OrderSummaryScreen(
                     orderUiState = uiState,
+                    onCancelButtonClicked = {
+                        cancelOrderAndNavigateToStart(viewModel,navController)
+                    },
+                    onSendButtonClicked = {subject : String, summary : String ->},
                     modifier = Modifier.fillMaxHeight()
                 )
             }
         }
     }
+}
+private fun cancelOrderAndNavigateToStart(
+    viewModel: OrderViewModel,
+    navController: NavHostController
+) {
+    viewModel.resetOrder()
+    navController.popBackStack(CupcakeScreen.Start.name, inclusive = false)
 }
