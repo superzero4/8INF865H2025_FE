@@ -86,7 +86,8 @@ fun GameScreen(gameViewModel: GameViewModel = GameViewModel()) {
             onUserGuessChanged = { gameViewModel.updateUserGuess(it) },
             onKeyboardDone = { gameViewModel.checkUserGuess() },
             userGuess = gameViewModel.userGuess,
-            isGuessWrong = gameUiState.isGuessedWordWrong
+            isGuessWrong = gameUiState.isGuessedWordWrong,
+            wordCount = gameUiState.currentWordCount
         )
         Column(
             modifier = Modifier
@@ -98,7 +99,7 @@ fun GameScreen(gameViewModel: GameViewModel = GameViewModel()) {
 
             Button(
                 modifier = Modifier.fillMaxWidth(),
-                onClick = { }
+                onClick = { gameViewModel.checkUserGuess() }
             ) {
                 Text(
                     text = stringResource(R.string.submit),
@@ -107,7 +108,7 @@ fun GameScreen(gameViewModel: GameViewModel = GameViewModel()) {
             }
 
             OutlinedButton(
-                onClick = { gameViewModel.checkUserGuess() },
+                onClick = { gameViewModel.skipWord() },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
@@ -117,7 +118,7 @@ fun GameScreen(gameViewModel: GameViewModel = GameViewModel()) {
             }
         }
 
-        GameStatus(score = 0, modifier = Modifier.padding(20.dp))
+        GameStatus(score = gameUiState.score, modifier = Modifier.padding(20.dp))
     }
 }
 
@@ -141,7 +142,8 @@ fun GameLayout(
     onUserGuessChanged: (String) -> Unit,
     onKeyboardDone: () -> Unit,
     userGuess: String,
-    isGuessWrong: Boolean
+    isGuessWrong: Boolean,
+    wordCount: Int,
 ) {
     val mediumPadding = dimensionResource(R.dimen.padding_medium)
 
@@ -160,7 +162,7 @@ fun GameLayout(
                     .background(colorScheme.surfaceTint)
                     .padding(horizontal = 10.dp, vertical = 4.dp)
                     .align(alignment = Alignment.End),
-                text = stringResource(R.string.word_count, 0),
+                text = stringResource(R.string.word_count, wordCount),
                 style = typography.titleMedium,
                 color = colorScheme.onPrimary
             )
